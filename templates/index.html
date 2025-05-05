@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="refresh" content="2" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rosa dos Ventos</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="compass">
+    <div class="needle" id="needle"></div>
+    <div class="center-dot"></div>
+  </div>
+  <h2 id="direction">Centro</h2>
+  <div id="angle">0°</div>
+
+  <script>
+    async function fetchState() {
+      try {
+        const resp = await fetch('/state');
+        const data = await resp.json();
+        document.getElementById('direction').textContent = data.direction;
+        document.getElementById('angle').textContent = data.angle + '°';
+        document.getElementById('needle').style.transform = 
+          `rotate(${data.angle}deg) translateX(-1px) translateY(-100%)`;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    // Atualiza a cada 2s (ou tempo de refresh HTML)
+    setInterval(fetchState, 2000);
+    fetchState();
+  </script>
+</body>
+</html>

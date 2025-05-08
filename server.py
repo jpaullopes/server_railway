@@ -15,7 +15,7 @@ lock = Lock()
 def index():
     return render_template('index.html')
 
-@app.route('/joystick', methods=['POST'])
+@app.route('/api/data', methods=['POST'])  # Changed route from /joystick to /api/data
 def joystick():
     data = request.get_json()
     if not data or 'direction' not in data:

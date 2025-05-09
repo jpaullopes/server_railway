@@ -1,0 +1,12 @@
+body { 
+    font-family: Arial; 
+    text-align: center; 
+    margin-top: 50px; 
+}
+
+.box { 
+    display: inline-block; 
+    border: 1px solid #ccc; 
+    padding: 20px; 
+    border-radius: 10px; 
+}

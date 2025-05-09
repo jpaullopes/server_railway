@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Joystick</title>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/joystick.css') }}">
+</head>
+<body>
+    <h1>Status do Joystick </h1>
+    <div class="box">
+    <p><strong>X:</strong> <span id="x">--</span></p>
+    <p><strong>Y:</strong> <span id="y">--</span></p>
+    <p><strong>Direção:</strong> <span id="direcao">--</span></p>
+    </div>
+    <script src="{{ url_for('static', filename='js/joystick.js') }}"></script>
+</body>
+</html>

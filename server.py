@@ -1,52 +1,30 @@
-from flask import Flask, request, jsonify, render_template
-from threading import Lock
+from flask import Flask, request, render_template
+from flask_socketio import SocketIO, emit
+import os
 
 app = Flask(__name__)
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+socketio = SocketIO(app, cors_allowed_origins="*") 
 
-# Guarda o último ângulo/direção do joystick
-state = {
-    'direction': 'Centro',
-    'angle': 0
-}
-lock = Lock()
+#Armazenar ultimo dado recebido
+ultimo_dado = {}
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/dados', methods = ['POST'])
+def receber_dados():
+    global ultimo_dado
+    data= request.json
+    ultimo_dado = data  #Salva os ultimos dados recebidos
+    print(f"Dados recebidos: {data}")
+    socketio.emit('novo_dado', data) 
+    return {"status": "ok"}, 200
 
-@app.route('/api/data', methods=['POST'])  # Changed route from /joystick to /api/data
-def joystick():
-    data = request.get_json()
-    if not data or 'direction' not in data:
-        return jsonify({'error': 'Invalid payload'}), 400
+@app.route('/dashboard/botoes')
+def dashboard_botoes():
+    return render_template('botoes.html')
 
-    # Traduz direção para ângulo
-    angles = {
-        'Centro': 0,
-        'Norte': 0,
-        'Leste': 90,
-        'Sul': 180,
-        'Oeste': 270,
-        'Nordeste': 45,
-        'Noroeste': 315,
-        'Sudeste': 135,
-        'Sudoeste': 225
-    }
-    dir_str = data['direction']
-    ang = angles.get(dir_str, 0)
-
-    with lock:
-        state['direction'] = dir_str
-        state['angle'] = ang
-
-    return jsonify({'status': 'ok'}), 200
-
-@app.route('/state')
-def get_state():
-    with lock:
-        return jsonify(state)
+@app.route('/dashboard/joystick')
+def dashboard_joystick():
+    return render_template('joystick.html')
 
 if __name__ == '__main__':
-    # porta 8080 se você quiser coincidir com seu Pico W
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    socketio.run(app, host='0.0.0.0', port=port)

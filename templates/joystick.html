@@ -6,12 +6,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/joystick.css') }}">
 </head>
 <body>
-    <h1>Status do Joystick </h1>
+    <h1>Status do Joystick</h1>
     <div class="box">
-    <p><strong>X:</strong> <span id="x">--</span></p>
-    <p><strong>Y:</strong> <span id="y">--</span></p>
-    <p><strong>Direção:</strong> <span id="direcao">--</span></p>
+        <p><strong>X:</strong> <span id="x">--</span></p>
+        <p><strong>Y:</strong> <span id="y">--</span></p>
+        <p><strong>Direção:</strong> <span id="direcao">--</span></p> (*Se você ainda quiser mostrar a direção textual*)
     </div>
+
+    (* Novo: Container para a Rosa dos Ventos *)
+    <div class="compass-container box">
+        <img src="{{ url_for('static', filename='images/compass_base.png') }}" alt="Rosa dos Ventos Base" class="compass-base">
+        <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="Seta Direcional" id="compass-arrow" class="compass-arrow">
+    </div>
+
     <script src="{{ url_for('static', filename='js/joystick.js') }}"></script>
 </body>
 </html>

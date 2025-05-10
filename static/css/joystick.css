@@ -1,10 +1,37 @@
-body { 
-    font-family: Arial; 
-    text-align: center; 
-    margin-top: 50px; 
+body {
+    font-family: Arial;
+    text-align: center;
+    margin-top: 50px;
 }
 
-.box { display: inline-block; 
-    border: 1px solid #ccc; 
-    padding: 20px; border-radius: 10px; 
+.box {
+    display: inline-block;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px; /* Adicionado para espaçamento */
+}
+
+/* Estilos para a Rosa dos Ventos */
+.compass-container {
+    position: relative; /* Importante para posicionar a seta sobre a base */
+    width: 200px; /* Ajuste o tamanho conforme suas imagens */
+    height: 200px; /* Ajuste o tamanho conforme suas imagens */
+    margin-left: auto; /* Centralizar */
+    margin-right: auto; /* Centralizar */
+}
+
+.compass-base {
+    width: 100%;
+    height: 100%;
+}
+
+.compass-arrow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* Ou o tamanho que fizer sentido para sua seta em relação à base */
+    height: 100%;
+    transform-origin: center center; /* Ponto de rotação da seta (meio) */
+    transition: transform 0.1s linear; /* Suaviza a rotação */
 }

@@ -36,53 +36,46 @@ document.addEventListener("DOMContentLoaded", (evento) => {
 
     /**
      * Calcula a direção do joystick baseado nas coordenadas X e Y.
-     * Lógica adaptada do seu código C.
+     * Lógica adaptada do seu código C e AJUSTADA CONFORME O FEEDBACK.
      * @param {number} x - Posição no eixo X (0-100)
      * @param {number} y - Posição no eixo Y (0-100)
      * @returns {string} - A direção textual ("NORTE", "SUL", "CENTRO", etc.)
      */
     function calcularDirecaoJoystickJS(x, y) {
-        const x_dead = (x >= DEAD_ZONE_MIN && x <= DEAD_ZONE_MAX);
-        const y_dead = (y >= DEAD_ZONE_MIN && y <= DEAD_ZONE_MAX);
+        const x_fisico_dead = (x >= DEAD_ZONE_MIN && x <= DEAD_ZONE_MAX);
+        const y_fisico_dead = (y >= DEAD_ZONE_MIN && y <= DEAD_ZONE_MAX);
 
-        // IMPORTANTE: No seu código C, parece que y_pos (Y > MAX) é NORTE
-        // e y_neg (Y < MIN) é SUL. Isso pode ser o contrário do que se espera
-        // em um sistema de coordenadas de tela onde Y cresce para baixo.
-        // Verifique se a orientação está correta para o seu caso visual.
-        //
-        // Assumindo a lógica do seu C:
-        // Y > MAX (y_pos no C) = NORTE (para cima)
-        // Y < MIN (y_neg no C) = SUL (para baixo)
-        // X > MAX (x_pos no C) = LESTE (direita)
-        // X < MIN (x_neg no C) = OESTE (esquerda)
-        //
-        // SE no seu joystick VISUALMENTE "para cima" (NORTE) corresponde a um Y MENOR (perto de 0),
-        // então as condições de Y precisam ser invertidas em relação ao seu código C.
-        // O código abaixo segue a lógica como está no seu C. Ajuste se necessário!
 
-        // Exemplo de lógica INVERTIDA para Y se necessário:
-        const y_para_norte = (y < DEAD_ZONE_MIN); // Y menor significa "para cima" (NORTE)
-        const y_para_sul = (y > DEAD_ZONE_MAX);   // Y maior significa "para baixo" (SUL)
-        const x_para_leste = (x > DEAD_ZONE_MAX); // Equivalente ao x_pos do C
-        const x_para_oeste = (x < DEAD_ZONE_MIN); // Equivalente ao x_neg do C
+        // SE X < DEAD_ZONE_MIN (físico ESQUERDA) -> NORTE
+        const x_para_norte = (x < DEAD_ZONE_MIN);
+        // SE X > DEAD_ZONE_MAX (físico DIREITA) -> SUL
+        const x_para_sul = (x > DEAD_ZONE_MAX);
 
-        if (x_dead && y_dead) return "CENTRO";
+        const y_para_leste = (y > DEAD_ZONE_MAX); // Y alto (cima) -> Leste
+        // Se "para BAIXO (físico Y) vai pro OESTE":
+        const y_para_oeste = (y < DEAD_ZONE_MIN); // Y baixo (baixo) -> Oeste
 
-        if (y_para_norte) { // "Para cima"
-            if (x_para_oeste) return "NOROESTE";   // Cima-esquerda
-            if (x_para_leste) return "NORDESTE";  // Cima-direita
-            return "NORTE";                       // Cima
+
+        if (x_fisico_dead && y_fisico_dead) return "CENTRO";
+
+        // Priorizando movimentos primários (N, S, E, O) e depois diagonais
+        // Baseado na ideia de que X controla Norte/Sul e Y controla Leste/Oeste
+
+        if (x_para_norte) { // Movimento físico para Esquerda (resultando em Norte)
+            if (y_para_leste) return "NORDESTE";  // Esquerda-Cima
+            if (y_para_oeste) return "NOROESTE";   // Esquerda-Baixo
+            return "NORTE";                       // Esquerda
         }
-        if (y_para_sul) {   // "Para baixo"
-            if (x_para_oeste) return "SUDOESTE";  // Baixo-esquerda
-            if (x_para_leste) return "SUDESTE";   // Baixo-direita
-            return "SUL";                         // Baixo
+        if (x_para_sul) {   // Movimento físico para Direita (resultando em Sul)
+            if (y_para_leste) return "SUDESTE";   // Direita-Cima
+            if (y_para_oeste) return "SUDOESTE";  // Direita-Baixo
+            return "SUL";                         // Direita
         }
-        // Apenas movimentos laterais
-        if (x_para_leste) return "LESTE";     // Direita
-        if (x_para_oeste) return "OESTE";     // Esquerda
+        // Apenas movimentos no eixo Y físico (resultando em Leste/Oeste)
+        if (y_para_leste) return "LESTE";     // Cima
+        if (y_para_oeste) return "OESTE";     // Baixo
 
-        return "CENTRO"; // Fallback, caso algo não se encaixe
+        return "CENTRO"; // Fallback
     }
 
     socket.on("novo_dado", function(dado) {

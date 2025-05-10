@@ -1,5 +1,7 @@
 body {
+
     font-family: Arial, sans-serif; /* Adicionei sans-serif como fallback */
+
     text-align: center;
     margin-top: 50px;
 }
@@ -9,6 +11,7 @@ body {
     border: 1px solid #ccc;
     padding: 20px;
     border-radius: 10px;
+
     position: relative; /* Adicionado para posicionar a rosa dos ventos dentro */
 }
 

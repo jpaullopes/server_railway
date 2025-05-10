@@ -1,5 +1,6 @@
 // Arquivo: servidor_railway/static/js/botoes.js
 document.addEventListener("DOMContentLoaded", (evento) => {
+
     const socket = io();
 
     socket.on('connect', function() {
@@ -13,9 +14,13 @@ document.addEventListener("DOMContentLoaded", (evento) => {
     socket.on("novo_dado", function (dado) {
         console.log("Dados recebidos (com temperatura):", dado);
 
+
+    socket.on("novo_dado", function (dado) { // 2. Fica escutando a mensagem "novo_dado"
+        // Pega os lugares no HTML onde a informação vai aparecer
         const statusBotaoAElement = document.getElementById("status_botao_a");
         const statusBotaoBElement = document.getElementById("status_botao_b");
         const statusTemperaturaElement = document.getElementById("status_temperatura"); // Novo elemento
+
 
         // --- Processamento para o Botão A ---
         let textoBotaoA = "0";

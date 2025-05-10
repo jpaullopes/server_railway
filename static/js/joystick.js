@@ -107,4 +107,5 @@ document.addEventListener("DOMContentLoaded", (evento) => {
             console.warn("Sigla de direção não mapeada para um elemento da rosa dos ventos:", siglaDirecao);
         }
     });
+
 });

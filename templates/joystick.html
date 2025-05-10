@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Joystick</title>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/joystick.css') }}">
 </head>
 <body>
-    <h1>Status do Joystick </h1>
+    <h1>Status do Joystick</h1>
     <div class="box">
         <p><strong>X:</strong> <span id="x">--</span></p>
         <p><strong>Y:</strong> <span id="y">--</span></p>
@@ -21,6 +23,7 @@
             <div class="direction southwest">SO</div> <div class="direction west">O</div>   <div class="direction northwest">NO</div> <div class="center-dot"></div>
         </div>
         </div>
+
     <script src="{{ url_for('static', filename='js/joystick.js') }}"></script>
 </body>
 </html>

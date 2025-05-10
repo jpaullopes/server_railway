@@ -1,17 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Status dos Botões</title>
-    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status dos Botões e Temperatura</title> <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/botoes.css') }}">
 </head>
 <body>
     <div class="box">
-        <h1>Status dos Botões</h1>
-        <p><strong>Botão A:</strong> <span id="status_botao_a">--</span></p>
-        <p><strong>Botão B:</strong> <span id="status_botao_b">--</span></p>
+        <h1>Status Geral</h1> <p>
+            <strong>Botão A:</strong>
+            <span id="status_botao_a">0</span>
+        </p>
+        <p>
+            <strong>Botão B:</strong>
+            <span id="status_botao_b">0</span>
+        </p>
+        <p>
+            <strong>Temperatura:</strong>
+            <span id="status_temperatura">--</span> <span>°C</span> </p>
     </div>
     
     <!-- Store server data in a data attribute -->

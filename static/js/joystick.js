@@ -1,59 +1,110 @@
 document.addEventListener("DOMContentLoaded", (evento) => {
     const socket = io(); // Conecta ao servidor SocketIO na mesma origem
 
-    const statusValorXElement = document.getElementById("x");
-    const statusValorYElement = document.getElementById("y");
-    const statusDirecaoElement = document.getElementById("direcao"); // Se você ainda usa
-    const compassArrowElement = document.getElementById("compass-arrow"); // Pega o elemento da seta
+    // --- Configurações do Joystick (replicadas do seu código C) ---
+    const DEAD_ZONE_MIN = 35;    // Limite inferior da zona morta (0-100)
+    const DEAD_ZONE_MAX = 65;    // Limite superior da zona morta (0-100)
 
-    socket.on("novo_dado", function(dado) {
-        let valorX = "--";
-        let valorY = "--";
-        let direcaoTextual = "--"; // Para a direção textual, se houver
+    // --- Mapeamento das direções ---
+    const mapeamentoDirecoes = {
+        "CENTRO": "Centro",
+        "LESTE": "E",
+        "OESTE": "O",
+        "NORTE": "N",
+        "SUL": "S",
+        "NORDESTE": "NE",
+        "NOROESTE": "NO",
+        "SUDESTE": "SE",
+        "SUDOESTE": "SO"
+    };
 
-        if (dado && typeof dado.x !== 'undefined' && typeof dado.y !== 'undefined') {
-            valorX = dado.x;
-            valorY = dado.y;
+    // Seleciona os elementos da rosa dos ventos no HTML
+    const direcoesRoseElements = {
+        "N": document.querySelector(".wind-rose .north"),
+        "NE": document.querySelector(".wind-rose .northeast"),
+        "E": document.querySelector(".wind-rose .east"),
+        "SE": document.querySelector(".wind-rose .southeast"),
+        "S": document.querySelector(".wind-rose .south"),
+        "SO": document.querySelector(".wind-rose .southwest"),
+        "O": document.querySelector(".wind-rose .west"),
+        "NO": document.querySelector(".wind-rose .northwest")
+    };
 
-            // Atualiza os valores X e Y
-            statusValorXElement.innerText = valorX;
-            statusValorYElement.innerText = valorY;
+    /**
+     * Calcula a direção do joystick baseado nas coordenadas X e Y.
+     * Lógica corrigida para mapear corretamente os eixos X e Y que estavam invertidos.
+     * @param {number} x - Posição no eixo X (0-100)
+     * @param {number} y - Posição no eixo Y (0-100)
+     * @returns {string} - A direção textual ("NORTE", "SUL", "CENTRO", etc.)
+     */
+    function calcularDirecaoJoystickJS(x, y) {
+        // CORREÇÃO: Os eixos X e Y estavam invertidos
+        // Invertendo os valores para processamento correto
+        const temp = x;
+        x = y;
+        y = temp;
+        
+        const x_dead = (x >= DEAD_ZONE_MIN && x <= DEAD_ZONE_MAX);
+        const y_dead = (y >= DEAD_ZONE_MIN && y <= DEAD_ZONE_MAX);
+        
+        const x_leste = (x > DEAD_ZONE_MAX);  // X alto = LESTE (direita)
+        const x_oeste = (x < DEAD_ZONE_MIN);  // X baixo = OESTE (esquerda)
+        
+        // CORREÇÃO: Invertendo Norte e Sul porque estavam ao contrário
+        const y_norte = (y > DEAD_ZONE_MAX);  // Y alto = NORTE (invertido para o hardware específico)
+        const y_sul = (y < DEAD_ZONE_MIN);    // Y baixo = SUL (invertido para o hardware específico)
 
-            if (compassArrowElement) {
-               
-                // Vamos assumir Y positivo para CIMA no joystick (como em um gráfico cartesiano)
-                let angleRad = Math.atan2(parseFloat(valorY), parseFloat(valorX));
-                let angleDeg = angleRad * (180 / Math.PI);
+        // Centro se ambos estiverem na zona morta
+        if (x_dead && y_dead) return "CENTRO";
 
-                let displayAngleDeg = angleDeg - 90; // Ajuste para alinhar a seta (que aponta para cima) com o ângulo trigonométrico
-                                                 // onde 0 é direita e 90 é cima.
-                
-                // Se o joystick está no centro (ou os valores não são numéricos), não gira
-                if (!isNaN(parseFloat(valorX)) && !isNaN(parseFloat(valorY)) && (parseFloat(valorX) !== 0 || parseFloat(valorY) !== 0)) {
-                    compassArrowElement.style.transform = `rotate(${displayAngleDeg}deg)`;
-                } else {
-                     // Opcional: resetar para uma posição padrão se estiver no centro, ex: apontar para cima
-                    compassArrowElement.style.transform = 'rotate(-90deg)'; // Ou a orientação que você quer para (0,0)
-                }
-            }
-
-            // Atualiza a direção textual, se você ainda a usa
-            if (dado && typeof dado.direcao !== 'undefined') {
-                 direcaoTextual = dado.direcao;
-            }
-        } else if (dado && (typeof dado.botao_a !== 'undefined' || typeof dado.botao_b !== 'undefined')) {
-          
-        } else {
-            // Dados não reconhecidos ou incompletos para joystick
-            statusValorXElement.innerText = "--";
-            statusValorYElement.innerText = "--";
-            if (compassArrowElement) {
-                 compassArrowElement.style.transform = 'rotate(-90deg)'; // Ou como preferir
-            }
+        // Determinar a direção baseada na combinação de X e Y
+        if (y_norte) {
+            if (x_oeste) return "NOROESTE";
+            if (x_leste) return "NORDESTE";
+            return "NORTE";
         }
         
-        if (statusDirecaoElement) { // Somente atualiza se o elemento existir
-            statusDirecaoElement.innerText = direcaoTextual;
+        if (y_sul) {
+            if (x_oeste) return "SUDOESTE";
+            if (x_leste) return "SUDESTE";
+            return "SUL";
+        }
+        
+        // Movimentos apenas horizontais
+        if (x_leste) return "LESTE";
+        if (x_oeste) return "OESTE";
+
+        return "CENTRO"; // Fallback
+    }
+
+    socket.on("novo_dado", function(dado) {
+        const statusValorXElement = document.getElementById("x");
+        const statusValorYElement = document.getElementById("y");
+        const statusDirecaoElement = document.getElementById("direcao");
+
+        let x_val = (dado && typeof dado.x !== 'undefined') ? dado.x : 50;
+        let y_val = (dado && typeof dado.y !== 'undefined') ? dado.y : 50;
+
+        statusValorXElement.innerText = x_val;
+        statusValorYElement.innerText = y_val;
+
+        let direcaoCalculadaTexto = calcularDirecaoJoystickJS(x_val, y_val);
+        let siglaDirecao = mapeamentoDirecoes[direcaoCalculadaTexto] || "--";
+
+        statusDirecaoElement.innerText = (siglaDirecao === "Centro" || siglaDirecao === "--") ? "--" : siglaDirecao;
+
+        // console.log(`X: ${x_val}, Y: ${y_val} -> Direção Texto: ${direcaoCalculadaTexto}, Sigla: ${siglaDirecao}`);
+
+        for (const keySigla in direcoesRoseElements) {
+            if (direcoesRoseElements[keySigla]) {
+                direcoesRoseElements[keySigla].classList.remove("active");
+            }
+        }
+
+        if (siglaDirecao && siglaDirecao !== "Centro" && siglaDirecao !== "--" && direcoesRoseElements[siglaDirecao]) {
+            direcoesRoseElements[siglaDirecao].classList.add("active");
+        } else if (siglaDirecao !== "Centro" && siglaDirecao !== "--") {
+            console.warn("Sigla de direção não mapeada para um elemento da rosa dos ventos:", siglaDirecao);
         }
     });
 

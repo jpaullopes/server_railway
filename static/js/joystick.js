@@ -6,10 +6,8 @@ document.addEventListener("DOMContentLoaded", (evento) => {
     const DEAD_ZONE_MAX = 65;    // Limite superior da zona morta (0-100)
 
     // --- Mapeamento das direções ---
-    // As CHAVES aqui são as strings que a nossa nova função calcularDirecaoJoystickJS vai retornar.
-    // Os VALORES são as siglas que queremos mostrar na tela e usar para as classes CSS da rosa dos ventos.
     const mapeamentoDirecoes = {
-        "CENTRO": "Centro", // Ou apenas "--" se preferir não mostrar "Centro"
+        "CENTRO": "Centro",
         "LESTE": "E",
         "OESTE": "O",
         "NORTE": "N",
@@ -21,7 +19,6 @@ document.addEventListener("DOMContentLoaded", (evento) => {
     };
 
     // Seleciona os elementos da rosa dos ventos no HTML
-    // As CHAVES aqui devem ser as SIGLAS (N, NE, E, etc.)
     const direcoesRoseElements = {
         "N": document.querySelector(".wind-rose .north"),
         "NE": document.querySelector(".wind-rose .northeast"),
@@ -31,49 +28,57 @@ document.addEventListener("DOMContentLoaded", (evento) => {
         "SO": document.querySelector(".wind-rose .southwest"),
         "O": document.querySelector(".wind-rose .west"),
         "NO": document.querySelector(".wind-rose .northwest")
-        // Não precisamos de "Centro" aqui, pois só destacamos direções ativas
     };
 
     /**
      * Calcula a direção do joystick baseado nas coordenadas X e Y.
-     * Lógica adaptada do seu código C e AJUSTADA CONFORME O FEEDBACK.
+     * ESTA VERSÃO VOLTA À LÓGICA ORIGINAL DO SEU C, MAS INVERTE AS COMPARAÇÕES
+     * PARA CORRIGIR O COMPORTAMENTO OBSERVADO.
      * @param {number} x - Posição no eixo X (0-100)
      * @param {number} y - Posição no eixo Y (0-100)
      * @returns {string} - A direção textual ("NORTE", "SUL", "CENTRO", etc.)
      */
     function calcularDirecaoJoystickJS(x, y) {
-        const x_fisico_dead = (x >= DEAD_ZONE_MIN && x <= DEAD_ZONE_MAX);
-        const y_fisico_dead = (y >= DEAD_ZONE_MIN && y <= DEAD_ZONE_MAX);
+        const x_dead = (x >= DEAD_ZONE_MIN && x <= DEAD_ZONE_MAX);
+        const y_dead = (y >= DEAD_ZONE_MIN && y <= DEAD_ZONE_MAX);
+
+        // Comportamento observado:
+        // Sobe (Y físico, esperado NORTE) -> SUL => Inverter lógica de Y para NORTE/SUL
+        // Desce (Y físico, esperado SUL) -> NORTE => Inverter lógica de Y para NORTE/SUL
+        // Direita (X físico, esperado LESTE) -> OESTE => Inverter lógica de X para LESTE/OESTE
+        // Esquerda (X físico, esperado OESTE) -> LESTE => Inverter lógica de X para LESTE/OESTE
+
+        // Lógica ORIGINAL do seu C (y_pos > MAX = NORTE, y_neg < MIN = SUL):
+        // bool y_pos = (y > DEAD_ZONE_MAX); // No C, isso era NORTE
+        // bool y_neg = (y < DEAD_ZONE_MIN); // No C, isso era SUL
+        // bool x_pos = (x > DEAD_ZONE_MAX); // No C, isso era LESTE
+        // bool x_neg = (x < DEAD_ZONE_MIN); // No C, isso era OESTE
+
+        // INVERTENDO as condições para o JavaScript:
+        // Se no C "Y > MAX" era NORTE, e agora está dando SUL, então para dar NORTE no JS, precisamos de "Y < MIN"
+        const y_para_norte = (y < DEAD_ZONE_MIN); // Se Y físico DESCE (valor menor), queremos NORTE
+        const y_para_sul = (y > DEAD_ZONE_MAX);   // Se Y físico SOBE (valor maior), queremos SUL
+
+        // Se no C "X > MAX" era LESTE, e agora está dando OESTE, então para dar LESTE no JS, precisamos de "X < MIN"
+        const x_para_leste = (x < DEAD_ZONE_MIN); // Se X físico vai para ESQUERDA (valor menor), queremos LESTE
+        const x_para_oeste = (x > DEAD_ZONE_MAX);  // Se X físico vai para DIREITA (valor maior), queremos OESTE
 
 
-        // SE X < DEAD_ZONE_MIN (físico ESQUERDA) -> NORTE
-        const x_para_norte = (x > DEAD_ZONE_MIN);
-        // SE X > DEAD_ZONE_MAX (físico DIREITA) -> SUL
-        const x_para_sul = (x < DEAD_ZONE_MAX);
+        if (x_dead && y_dead) return "CENTRO";
 
-        const y_para_leste = (y < DEAD_ZONE_MAX); // Y alto (cima) -> Leste
-        // Se "para BAIXO (físico Y) vai pro OESTE":
-        const y_para_oeste = (y > DEAD_ZONE_MIN); // Y baixo (baixo) -> Oeste
-
-
-        if (x_fisico_dead && y_fisico_dead) return "CENTRO";
-
-        // Priorizando movimentos primários (N, S, E, O) e depois diagonais
-        // Baseado na ideia de que X controla Norte/Sul e Y controla Leste/Oeste
-
-        if (x_para_norte) { // Movimento físico para Esquerda (resultando em Norte)
-            if (y_para_leste) return "NORDESTE";  // Esquerda-Cima
-            if (y_para_oeste) return "NOROESTE";   // Esquerda-Baixo
-            return "NORTE";                       // Esquerda
+        if (y_para_norte) { // Esperado NORTE
+            if (x_para_oeste) return "NOROESTE";
+            if (x_para_leste) return "NORDESTE";
+            return "NORTE";
         }
-        if (x_para_sul) {   // Movimento físico para Direita (resultando em Sul)
-            if (y_para_leste) return "SUDESTE";   // Direita-Cima
-            if (y_para_oeste) return "SUDOESTE";  // Direita-Baixo
-            return "SUL";                         // Direita
+        if (y_para_sul) {   // Esperado SUL
+            if (x_para_oeste) return "SUDOESTE";
+            if (x_para_leste) return "SUDESTE";
+            return "SUL";
         }
-        // Apenas movimentos no eixo Y físico (resultando em Leste/Oeste)
-        if (y_para_leste) return "LESTE";     // Cima
-        if (y_para_oeste) return "OESTE";     // Baixo
+        // Apenas movimentos laterais
+        if (x_para_leste) return "LESTE";
+        if (x_para_oeste) return "OESTE";
 
         return "CENTRO"; // Fallback
     }
@@ -83,40 +88,29 @@ document.addEventListener("DOMContentLoaded", (evento) => {
         const statusValorYElement = document.getElementById("y");
         const statusDirecaoElement = document.getElementById("direcao");
 
-        // Assume que 'dado' terá as chaves 'x' e 'y' (e talvez 'button')
-        let x_val = (dado && typeof dado.x !== 'undefined') ? dado.x : 50; // Padrão para centro
-        let y_val = (dado && typeof dado.y !== 'undefined') ? dado.y : 50; // Padrão para centro
+        let x_val = (dado && typeof dado.x !== 'undefined') ? dado.x : 50;
+        let y_val = (dado && typeof dado.y !== 'undefined') ? dado.y : 50;
 
         statusValorXElement.innerText = x_val;
         statusValorYElement.innerText = y_val;
 
-        // 1. Calcular a direção AQUI no JavaScript
-        let direcaoCalculadaTexto = calcularDirecaoJoystickJS(x_val, y_val); // Ex: "NORTE", "SUL", etc.
-
-        // 2. Usar o mapeamento para obter a sigla (N, S, E, etc.)
+        let direcaoCalculadaTexto = calcularDirecaoJoystickJS(x_val, y_val);
         let siglaDirecao = mapeamentoDirecoes[direcaoCalculadaTexto] || "--";
 
-        // 3. Atualizar o texto da direção na página
         statusDirecaoElement.innerText = (siglaDirecao === "Centro" || siglaDirecao === "--") ? "--" : siglaDirecao;
 
-        // DEBUG: Verifique os valores no console
         // console.log(`X: ${x_val}, Y: ${y_val} -> Direção Texto: ${direcaoCalculadaTexto}, Sigla: ${siglaDirecao}`);
 
-        // 4. Atualizar a rosa dos ventos
-        // Primeiro, remove a classe 'active' de todas as direções
-        for (const keySigla in direcoesRoseElements) { // Itera sobre as SIGLAS N, NE, E...
+        for (const keySigla in direcoesRoseElements) {
             if (direcoesRoseElements[keySigla]) {
                 direcoesRoseElements[keySigla].classList.remove("active");
             }
         }
 
-        // Depois, adiciona a classe 'active' à direção atual (usando a SIGLA)
-        // Verifica se a siglaDirecao existe como chave em direcoesRoseElements
         if (siglaDirecao && siglaDirecao !== "Centro" && siglaDirecao !== "--" && direcoesRoseElements[siglaDirecao]) {
             direcoesRoseElements[siglaDirecao].classList.add("active");
         } else if (siglaDirecao !== "Centro" && siglaDirecao !== "--") {
-            // Este log pode aparecer se a siglaDirecao for algo que não tem um elemento correspondente
             console.warn("Sigla de direção não mapeada para um elemento da rosa dos ventos:", siglaDirecao);
         }
-    }); // Fim do socket.on("novo_dado")
-}); // Fim do document.addEventListener("DOMContentLoaded")
+    });
+});

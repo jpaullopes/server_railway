@@ -2,20 +2,32 @@ document.addEventListener("DOMContentLoaded", (evento) => {
     const socket = io(); // Conecta ao servidor SocketIO na mesma origem
 
     socket.on("novo_dado", function (dado) {
-        // Verifica se os dados dos botões existem antes de tentar acessá-los
-
         const statusBotaoAElement = document.getElementById("status_botao_a");
         const statusBotaoBElement = document.getElementById("status_botao_b");
 
-        if (dado && typeof dado.botao_a !== 'undefined') {
-            statusBotaoAElement.innerText = dado.botao_a == 1 ? "Pressionado!" : dado.botao_a == 0 ? "Solto" : "N/A";
+        // O PicoW envia a chave "button" (minúsculo)
+        if (dado && typeof dado.button !== 'undefined') {
+            // Atualiza o texto do Botão A
+            statusBotaoAElement.innerText = dado.button == 1 ? "Pressionado!" : "Solto";
+
+            // Adiciona/remove classes para estilização visual
+            if (dado.button == 1) {
+                statusBotaoAElement.classList.add("pressionado");
+                statusBotaoAElement.classList.remove("solto");
+            } else {
+                statusBotaoAElement.classList.add("solto");
+                statusBotaoAElement.classList.remove("pressionado");
+            }
         } else {
+            // Se não houver informação do botão, mostra N/A
             statusBotaoAElement.innerText = "N/A";
+            statusBotaoAElement.classList.remove("pressionado", "solto");
         }
-        if (dado && typeof dado.botao_b !== 'undefined') {
-            statusBotaoBElement.innerText = dado.botao_b == 1 ? "Pressionado!" : dado.botao_b == 0 ? "Solto" : "N/A";
-        } else {
-            statusBotaoBElement.innerText = "N/A";
-        }
+
+        // Botão B continuará como N/A, pois não recebemos dados para ele
+        statusBotaoBElement.innerText = "N/A";
+        // Remove quaisquer classes de estado do Botão B, caso existam
+        statusBotaoBElement.classList.remove("pressionado", "solto");
+        statusBotaoBElement.classList.add("na"); // Adiciona uma classe para estilizar o N/A
     });
 });

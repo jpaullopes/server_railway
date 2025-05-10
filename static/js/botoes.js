@@ -1,5 +1,6 @@
+// Arquivo: servidor_railway/static/js/botoes.js
 document.addEventListener("DOMContentLoaded", (evento) => {
-    const socket = io(); // Conecta ao servidor SocketIO na mesma origem
+    const socket = io();
 
     socket.on('connect', function() {
         console.log('SocketIO conectado na página de botões!');
@@ -10,54 +11,56 @@ document.addEventListener("DOMContentLoaded", (evento) => {
     });
 
     socket.on("novo_dado", function (dado) {
-        console.log("Dados recebidos na página de botões:", dado); // Verifique este log no console do navegador!
+        console.log("Dados recebidos (com temperatura):", dado);
 
         const statusBotaoAElement = document.getElementById("status_botao_a");
         const statusBotaoBElement = document.getElementById("status_botao_b");
+        const statusTemperaturaElement = document.getElementById("status_temperatura"); // Novo elemento
 
+        // --- Processamento para o Botão A ---
         let textoBotaoA = "0";
         let estadoNumericoA = 0;
-        let textoBotaoB = "0";
-        let estadoNumericoB = 0;
-
-        // Processar Botão A
         if (dado && typeof dado.button_a !== 'undefined') {
             estadoNumericoA = parseInt(dado.button_a, 10);
-            if (estadoNumericoA === 1) {
-                textoBotaoA = "Pressionado!";
-            } else {
-                textoBotaoA = "0"; // Se for 0 ou qualquer outro valor não-1
-            }
+            textoBotaoA = (estadoNumericoA === 1) ? "Pressionado!" : "0";
         } else {
-            console.log("'dado.button_a' não definido. Usando '0'.");
+            console.warn("'dado.button_a' não definido. Usando '0'.");
         }
         statusBotaoAElement.innerText = textoBotaoA;
-        if (estadoNumericoA === 1) {
-            statusBotaoAElement.classList.add("pressionado");
-            statusBotaoAElement.classList.remove("solto", "na");
-        } else {
-            statusBotaoAElement.classList.add("solto"); // Usaremos 'solto' para o estado "0"
-            statusBotaoAElement.classList.remove("pressionado", "na");
-        }
+        statusBotaoAElement.classList.remove("pressionado", "solto", "na");
+        statusBotaoAElement.classList.add(estadoNumericoA === 1 ? "pressionado" : "solto");
 
-        // Processar Botão B
+        // --- Processamento para o Botão B ---
+        let textoBotaoB = "0";
+        let estadoNumericoB = 0;
         if (dado && typeof dado.button_b !== 'undefined') {
             estadoNumericoB = parseInt(dado.button_b, 10);
-            if (estadoNumericoB === 1) {
-                textoBotaoB = "Pressionado!";
-            } else {
-                textoBotaoB = "0"; // Se for 0 ou qualquer outro valor não-1
-            }
+            textoBotaoB = (estadoNumericoB === 1) ? "Pressionado!" : "0";
         } else {
-            console.log("'dado.button_b' não definido. Usando '0'.");
+            console.warn("'dado.button_b' não definido. Usando '0'.");
         }
         statusBotaoBElement.innerText = textoBotaoB;
-        if (estadoNumericoB === 1) {
-            statusBotaoBElement.classList.add("pressionado");
-            statusBotaoBElement.classList.remove("solto", "na");
+        statusBotaoBElement.classList.remove("pressionado", "solto", "na");
+        statusBotaoBElement.classList.add(estadoNumericoB === 1 ? "pressionado" : "solto");
+
+        // --- Processamento para a Temperatura ---
+        let textoTemperatura = "--"; // Valor padrão se não houver dados
+        if (dado && typeof dado.temperature !== 'undefined') {
+            // Formata para duas casas decimais, mesmo que venha com mais ou menos
+            // O parseFloat garante que é um número antes de tentar formatar.
+            const temperaturaNumerica = parseFloat(dado.temperature);
+            if (!isNaN(temperaturaNumerica)) { // Verifica se é um número válido
+                textoTemperatura = temperaturaNumerica.toFixed(2); // Formata para 2 casas decimais
+            } else {
+                console.warn("'dado.temperature' não é um número válido:", dado.temperature);
+                textoTemperatura = "Erro"; // Ou mantém "--"
+            }
         } else {
-            statusBotaoBElement.classList.add("solto"); // Usaremos 'solto' para o estado "0"
-            statusBotaoBElement.classList.remove("pressionado", "na");
+            console.warn("'dado.temperature' não definido. Usando '--'.");
         }
+        statusTemperaturaElement.innerText = textoTemperatura;
+        // Você pode adicionar classes CSS para a temperatura se quiser estilizar (ex: cor por faixa)
+        // Ex: statusTemperaturaElement.className = ''; // Limpa classes antigas
+        // if (temperaturaNumerica > 30) statusTemperaturaElement.classList.add("quente");
     });
 });

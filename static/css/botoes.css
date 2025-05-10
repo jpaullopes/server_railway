@@ -63,3 +63,15 @@ p {
     color: #6c757d;
     border-color: #dee2e6;
 }
+
+p:has(#status_temperatura) { /* Seleciona o <p> que contém o span da temperatura */
+    margin-top: 20px; /* Adiciona um pouco mais de espaço acima da temperatura */
+    font-size: 1.2em; /* Destaca um pouco mais a temperatura */
+}
+
+#status_temperatura {
+    color: #007bff; /* Uma cor diferente para o valor da temperatura, por exemplo */
+    font-weight: bold;
+    padding: 5px;
+    /* Outros estilos que você queira */
+}

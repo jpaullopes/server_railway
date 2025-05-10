@@ -47,13 +47,13 @@ document.addEventListener("DOMContentLoaded", (evento) => {
 
 
         // SE X < DEAD_ZONE_MIN (físico ESQUERDA) -> NORTE
-        const x_para_norte = (x < DEAD_ZONE_MIN);
+        const x_para_norte = (x > DEAD_ZONE_MIN);
         // SE X > DEAD_ZONE_MAX (físico DIREITA) -> SUL
-        const x_para_sul = (x > DEAD_ZONE_MAX);
+        const x_para_sul = (x < DEAD_ZONE_MAX);
 
-        const y_para_leste = (y > DEAD_ZONE_MAX); // Y alto (cima) -> Leste
+        const y_para_leste = (y < DEAD_ZONE_MAX); // Y alto (cima) -> Leste
         // Se "para BAIXO (físico Y) vai pro OESTE":
-        const y_para_oeste = (y < DEAD_ZONE_MIN); // Y baixo (baixo) -> Oeste
+        const y_para_oeste = (y > DEAD_ZONE_MIN); // Y baixo (baixo) -> Oeste
 
 
         if (x_fisico_dead && y_fisico_dead) return "CENTRO";

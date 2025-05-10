@@ -32,20 +32,20 @@ document.addEventListener("DOMContentLoaded", (evento) => {
 
     /**
      * Calcula a direção do joystick baseado nas coordenadas X e Y.
-     * Lógica corrigida para mapear corretamente os eixos X e Y.
+     * Lógica corrigida para mapear corretamente os eixos X e Y que estavam invertidos.
      * @param {number} x - Posição no eixo X (0-100)
      * @param {number} y - Posição no eixo Y (0-100)
      * @returns {string} - A direção textual ("NORTE", "SUL", "CENTRO", etc.)
      */
     function calcularDirecaoJoystickJS(x, y) {
+        // CORREÇÃO: Os eixos X e Y estavam invertidos
+        // Invertendo os valores para processamento correto
+        const temp = x;
+        x = y;
+        y = temp;
+        
         const x_dead = (x >= DEAD_ZONE_MIN && x <= DEAD_ZONE_MAX);
         const y_dead = (y >= DEAD_ZONE_MIN && y <= DEAD_ZONE_MAX);
-
-        // Lógica normal e padrão para joystick:
-        // X aumenta quando vai para direita -> LESTE
-        // X diminui quando vai para esquerda -> OESTE
-        // Y aumenta quando vai para baixo -> SUL
-        // Y diminui quando vai para cima -> NORTE
         
         const x_leste = (x > DEAD_ZONE_MAX);  // X alto = LESTE (direita)
         const x_oeste = (x < DEAD_ZONE_MIN);  // X baixo = OESTE (esquerda)

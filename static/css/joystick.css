@@ -35,3 +35,14 @@ body {
     transform-origin: center center; /* Ponto de rotação da seta (meio) */
     transition: transform 0.1s linear; /* Suaviza a rotação */
 }
+
+@media (max-width: 600px) {
+    .compass-container {
+        width: 80%;
+        height: auto;
+    }
+    .compass-base, .compass-arrow {
+        width: 100%;
+        height: auto;
+    }
+}

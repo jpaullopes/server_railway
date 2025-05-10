@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Status dos Botões</title>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/botoes.css') }}">
@@ -8,7 +10,30 @@
 <body>
     <div class="box">
         <h1>Status dos Botões</h1>
-        <p><strong>Botão A:</strong> <span id="status_botao_a">--</span></p> <p><strong>Botão B:</strong> <span id="status_botao_b">--</span></p> </div>
+        <p><strong>Botão A:</strong> <span id="status_botao_a">--</span></p>
+        <p><strong>Botão B:</strong> <span id="status_botao_b">--</span></p>
+    </div>
+    
+    <!-- Store server data in a data attribute -->
+    <div id="server-data" data-initial='{{ initial_data | tojson | safe }}' style="display: none;"></div>
+    
+    <!-- Main application logic -->
+    <script>
+        // Parse data from the HTML element
+        const dataElement = document.getElementById('server-data');
+        const initialData = dataElement ? JSON.parse(dataElement.dataset.initial || '{}') : { botao_a: undefined, botao_b: undefined };
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            const statusA = document.getElementById("status_botao_a");
+            const statusB = document.getElementById("status_botao_b");
+            if (initialData.botao_a !== undefined) {
+                statusA.innerText = initialData.botao_a == 1 ? "Pressionado!" : "Solto";
+            }
+            if (initialData.botao_b !== undefined) {
+                statusB.innerText = initialData.botao_b == 1 ? "Pressionado!" : "Solto";
+            }
+        });
+    </script>
     <script src="{{ url_for('static', filename='js/botoes.js') }}"></script>
 </body>
 </html>

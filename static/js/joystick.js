@@ -49,8 +49,10 @@ document.addEventListener("DOMContentLoaded", (evento) => {
         
         const x_leste = (x > DEAD_ZONE_MAX);  // X alto = LESTE (direita)
         const x_oeste = (x < DEAD_ZONE_MIN);  // X baixo = OESTE (esquerda)
-        const y_norte = (y < DEAD_ZONE_MIN);  // Y baixo = NORTE (cima)
-        const y_sul = (y > DEAD_ZONE_MAX);    // Y alto = SUL (baixo)
+        
+        // CORREÇÃO: Invertendo Norte e Sul porque estavam ao contrário
+        const y_norte = (y > DEAD_ZONE_MAX);  // Y alto = NORTE (invertido para o hardware específico)
+        const y_sul = (y < DEAD_ZONE_MIN);    // Y baixo = SUL (invertido para o hardware específico)
 
         // Centro se ambos estiverem na zona morta
         if (x_dead && y_dead) return "CENTRO";

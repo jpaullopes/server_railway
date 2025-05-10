@@ -56,12 +56,12 @@ document.addEventListener("DOMContentLoaded", (evento) => {
 
         // INVERTENDO as condições para o JavaScript:
         // Se no C "Y > MAX" era NORTE, e agora está dando SUL, então para dar NORTE no JS, precisamos de "Y < MIN"
-        const y_para_norte = (y < DEAD_ZONE_MIN); // Se Y físico DESCE (valor menor), queremos NORTE
-        const y_para_sul = (y > DEAD_ZONE_MAX);   // Se Y físico SOBE (valor maior), queremos SUL
+        const y_para_norte = (y > DEAD_ZONE_MIN); // Se Y físico DESCE (valor menor), queremos NORTE
+        const y_para_sul = (y < DEAD_ZONE_MAX);   // Se Y físico SOBE (valor maior), queremos SUL
 
         // Se no C "X > MAX" era LESTE, e agora está dando OESTE, então para dar LESTE no JS, precisamos de "X < MIN"
-        const x_para_leste = (x < DEAD_ZONE_MIN); // Se X físico vai para ESQUERDA (valor menor), queremos LESTE
-        const x_para_oeste = (x > DEAD_ZONE_MAX);  // Se X físico vai para DIREITA (valor maior), queremos OESTE
+        const x_para_leste = (x > DEAD_ZONE_MIN); // Se X físico vai para ESQUERDA (valor menor), queremos LESTE
+        const x_para_oeste = (x < DEAD_ZONE_MAX);  // Se X físico vai para DIREITA (valor maior), queremos OESTE
 
 
         if (x_dead && y_dead) return "CENTRO";

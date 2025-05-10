@@ -32,8 +32,7 @@ document.addEventListener("DOMContentLoaded", (evento) => {
 
     /**
      * Calcula a direção do joystick baseado nas coordenadas X e Y.
-     * ESTA VERSÃO VOLTA À LÓGICA ORIGINAL DO SEU C, MAS INVERTE AS COMPARAÇÕES
-     * PARA CORRIGIR O COMPORTAMENTO OBSERVADO.
+     * Lógica corrigida para mapear corretamente os eixos X e Y.
      * @param {number} x - Posição no eixo X (0-100)
      * @param {number} y - Posição no eixo Y (0-100)
      * @returns {string} - A direção textual ("NORTE", "SUL", "CENTRO", etc.)
@@ -42,43 +41,36 @@ document.addEventListener("DOMContentLoaded", (evento) => {
         const x_dead = (x >= DEAD_ZONE_MIN && x <= DEAD_ZONE_MAX);
         const y_dead = (y >= DEAD_ZONE_MIN && y <= DEAD_ZONE_MAX);
 
-        // Comportamento observado:
-        // Sobe (Y físico, esperado NORTE) -> SUL => Inverter lógica de Y para NORTE/SUL
-        // Desce (Y físico, esperado SUL) -> NORTE => Inverter lógica de Y para NORTE/SUL
-        // Direita (X físico, esperado LESTE) -> OESTE => Inverter lógica de X para LESTE/OESTE
-        // Esquerda (X físico, esperado OESTE) -> LESTE => Inverter lógica de X para LESTE/OESTE
+        // Lógica normal e padrão para joystick:
+        // X aumenta quando vai para direita -> LESTE
+        // X diminui quando vai para esquerda -> OESTE
+        // Y aumenta quando vai para baixo -> SUL
+        // Y diminui quando vai para cima -> NORTE
+        
+        const x_leste = (x > DEAD_ZONE_MAX);  // X alto = LESTE (direita)
+        const x_oeste = (x < DEAD_ZONE_MIN);  // X baixo = OESTE (esquerda)
+        const y_norte = (y < DEAD_ZONE_MIN);  // Y baixo = NORTE (cima)
+        const y_sul = (y > DEAD_ZONE_MAX);    // Y alto = SUL (baixo)
 
-        // Lógica ORIGINAL do seu C (y_pos > MAX = NORTE, y_neg < MIN = SUL):
-        // bool y_pos = (y > DEAD_ZONE_MAX); // No C, isso era NORTE
-        // bool y_neg = (y < DEAD_ZONE_MIN); // No C, isso era SUL
-        // bool x_pos = (x > DEAD_ZONE_MAX); // No C, isso era LESTE
-        // bool x_neg = (x < DEAD_ZONE_MIN); // No C, isso era OESTE
-
-        // INVERTENDO as condições para o JavaScript:
-        // Se no C "Y > MAX" era NORTE, e agora está dando SUL, então para dar NORTE no JS, precisamos de "Y < MIN"
-        const y_para_norte = (y > DEAD_ZONE_MIN); // Se Y físico DESCE (valor menor), queremos NORTE
-        const y_para_sul = (y < DEAD_ZONE_MAX);   // Se Y físico SOBE (valor maior), queremos SUL
-
-        // Se no C "X > MAX" era LESTE, e agora está dando OESTE, então para dar LESTE no JS, precisamos de "X < MIN"
-        const x_para_leste = (x > DEAD_ZONE_MIN); // Se X físico vai para ESQUERDA (valor menor), queremos LESTE
-        const x_para_oeste = (x < DEAD_ZONE_MAX);  // Se X físico vai para DIREITA (valor maior), queremos OESTE
-
-
+        // Centro se ambos estiverem na zona morta
         if (x_dead && y_dead) return "CENTRO";
 
-        if (y_para_norte) { // Esperado NORTE
-            if (x_para_oeste) return "NOROESTE";
-            if (x_para_leste) return "NORDESTE";
+        // Determinar a direção baseada na combinação de X e Y
+        if (y_norte) {
+            if (x_oeste) return "NOROESTE";
+            if (x_leste) return "NORDESTE";
             return "NORTE";
         }
-        if (y_para_sul) {   // Esperado SUL
-            if (x_para_oeste) return "SUDOESTE";
-            if (x_para_leste) return "SUDESTE";
+        
+        if (y_sul) {
+            if (x_oeste) return "SUDOESTE";
+            if (x_leste) return "SUDESTE";
             return "SUL";
         }
-        // Apenas movimentos laterais
-        if (x_para_leste) return "LESTE";
-        if (x_para_oeste) return "OESTE";
+        
+        // Movimentos apenas horizontais
+        if (x_leste) return "LESTE";
+        if (x_oeste) return "OESTE";
 
         return "CENTRO"; // Fallback
     }

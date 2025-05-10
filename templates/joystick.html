@@ -8,10 +8,19 @@
 <body>
     <h1>Status do Joystick </h1>
     <div class="box">
-    <p><strong>X:</strong> <span id="x">--</span></p>
-    <p><strong>Y:</strong> <span id="y">--</span></p>
-    <p><strong>Direção:</strong> <span id="direcao">--</span></p>
-    </div>
+        <p><strong>X:</strong> <span id="x">--</span></p>
+        <p><strong>Y:</strong> <span id="y">--</span></p>
+        <p><strong>Direção:</strong> <span id="direcao">--</span></p>
+
+        <div class="wind-rose">
+            <div class="direction north">N</div>
+            <div class="direction northeast">NE</div>
+            <div class="direction east">E</div>
+            <div class="direction southeast">SE</div>
+            <div class="direction south">S</div>
+            <div class="direction southwest">SO</div> <div class="direction west">O</div>   <div class="direction northwest">NO</div> <div class="center-dot"></div>
+        </div>
+        </div>
     <script src="{{ url_for('static', filename='js/joystick.js') }}"></script>
 </body>
 </html>

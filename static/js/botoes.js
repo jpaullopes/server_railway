@@ -1,33 +1,50 @@
 document.addEventListener("DOMContentLoaded", (evento) => {
     const socket = io(); // Conecta ao servidor SocketIO na mesma origem
 
+    // Verifica se o socket conectou
+    socket.on('connect', function() {
+        console.log('SocketIO conectado na página de botões!');
+    });
+
+    socket.on('connect_error', (err) => {
+        console.error('Erro ao conectar SocketIO:', err);
+    });
+
     socket.on("novo_dado", function (dado) {
+        console.log("Dados recebidos na página de botões:", dado); // LOG IMPORTANTE!
+
         const statusBotaoAElement = document.getElementById("status_botao_a");
         const statusBotaoBElement = document.getElementById("status_botao_b");
 
-        // O PicoW envia a chave "button" (minúsculo)
-        if (dado && typeof dado.button !== 'undefined') {
-            // Atualiza o texto do Botão A
-            statusBotaoAElement.innerText = dado.button == 1 ? "Pressionado!" : "Solto";
+        let textoBotaoA = "0"; // Valor padrão se não houver dados ou botão solto
+        let estadoBotaoA = 0;  // Valor numérico do estado (0 para solto, 1 para pressionado)
 
-            // Adiciona/remove classes para estilização visual
-            if (dado.button == 1) {
-                statusBotaoAElement.classList.add("pressionado");
-                statusBotaoAElement.classList.remove("solto");
+        if (dado && typeof dado.button !== 'undefined') {
+            estadoBotaoA = parseInt(dado.button, 10); // Garante que é um número
+            if (estadoBotaoA === 1) {
+                textoBotaoA = "Pressionado!";
             } else {
-                statusBotaoAElement.classList.add("solto");
-                statusBotaoAElement.classList.remove("pressionado");
+                textoBotaoA = "0"; // Se for 0 ou qualquer outro valor não-1, consideramos "0" (solto)
             }
         } else {
-            // Se não houver informação do botão, mostra N/A
-            statusBotaoAElement.innerText = "N/A";
-            statusBotaoAElement.classList.remove("pressionado", "solto");
+            // Se 'dado.button' não estiver definido, continua como "0" (estado padrão)
+            console.log("'dado.button' não definido. Usando '0' como padrão.");
         }
 
-        // Botão B continuará como N/A, pois não recebemos dados para ele
-        statusBotaoBElement.innerText = "N/A";
-        // Remove quaisquer classes de estado do Botão B, caso existam
+        statusBotaoAElement.innerText = textoBotaoA;
+
+        // Adiciona/remove classes para estilização visual
+        if (estadoBotaoA === 1) {
+            statusBotaoAElement.classList.add("pressionado");
+            statusBotaoAElement.classList.remove("solto", "na"); // Remove 'na' também
+        } else {
+            statusBotaoAElement.classList.add("solto"); // Classe para estado "0" / solto
+            statusBotaoAElement.classList.remove("pressionado", "na");
+        }
+
+        // Para o Botão B, como não temos dados para ele:
+        statusBotaoBElement.innerText = "0"; // Mostrar "0"
+        statusBotaoBElement.classList.add("na"); // Classe para estilizar como N/A ou desabilitado
         statusBotaoBElement.classList.remove("pressionado", "solto");
-        statusBotaoBElement.classList.add("na"); // Adiciona uma classe para estilizar o N/A
     });
 });

@@ -2,45 +2,44 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
     margin-top: 50px;
-    background-color: #f8f9fa; /* Um fundo um pouco mais claro */
-    color: #343a40; /* Cor de texto principal mais escura */
+    background-color: #f8f9fa;
+    color: #343a40;
 }
 
 .box {
     display: inline-block;
-    border: 1px solid #ced4da; /* Borda um pouco mais suave */
-    padding: 25px 35px; /* Aumentei o padding */
-    border-radius: 12px; /* Bordas mais arredondadas */
+    border: 1px solid #ced4da;
+    padding: 25px 35px;
+    border-radius: 12px;
     background-color: #ffffff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Sombra um pouco mais pronunciada */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     min-width: 300px;
 }
 
 h1 {
     color: #495057;
-    margin-bottom: 30px; /* Mais espaço abaixo do título */
+    margin-bottom: 30px;
 }
 
 p {
-    font-size: 1.15em; /* Fonte ligeiramente maior para os parágrafos */
+    font-size: 1.15em;
     margin: 18px 0;
 }
 
-/* Estilo base para os spans de status dos botões */
 #status_botao_a,
 #status_botao_b {
     font-weight: bold;
-    padding: 10px 18px; /* Padding dentro do span */
-    border-radius: 8px;  /* Bordas do span mais arredondadas */
+    padding: 10px 18px;
+    border-radius: 8px;
     display: inline-block;
-    min-width: 130px;     /* Largura mínima */
+    min-width: 130px;
     text-align: center;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-    border: 1px solid transparent; /* Borda base transparente */
-    line-height: 1.5; /* Melhorar espaçamento vertical interno */
+    border: 1px solid transparent;
+    line-height: 1.5;
 }
 
-/* Estilo para Botão A: SOLTO */
+/* Estilo para Botão A: SOLTO (estado "0") */
 #status_botao_a.solto {
     background-color: #6c757d; /* Cinza (Bootstrap secondary) */
     color: white;
@@ -54,10 +53,11 @@ p {
     border-color: #1e7e34;
 }
 
-/* Estilo para estado N/A (Botão A sem dados ou Botão B) */
-#status_botao_a:not(.solto):not(.pressionado), /* Se Botão A não tiver classe de estado */
-#status_botao_b.na { /* Aplicado ao Botão B que sempre terá a classe 'na' */
-    background-color: #e9ecef; /* Cinza bem clarinho (Bootstrap light) */
-    color: #6c757d; /* Cor do texto para N/A */
+/* Estilo para estado "Não Aplicável" ou "Desabilitado" (para Botão B mostrando "0") */
+/* Também será o fallback para Botão A se nenhuma classe de estado for aplicada */
+#status_botao_a:not(.solto):not(.pressionado),
+#status_botao_b.na {
+    background-color: #e9ecef; /* Cinza bem clarinho */
+    color: #6c757d;
     border-color: #dee2e6;
 }

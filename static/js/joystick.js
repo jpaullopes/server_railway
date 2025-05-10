@@ -60,8 +60,9 @@ document.addEventListener("DOMContentLoaded", (evento) => {
         // então as condições de Y precisam ser invertidas em relação ao seu código C.
         // O código abaixo segue a lógica como está no seu C. Ajuste se necessário!
 
-        const y_para_norte = (y > DEAD_ZONE_MAX); // Equivalente ao y_pos do C
-        const y_para_sul = (y < DEAD_ZONE_MIN);   // Equivalente ao y_neg do C
+        // Exemplo de lógica INVERTIDA para Y se necessário:
+        const y_para_norte = (y < DEAD_ZONE_MIN); // Y menor significa "para cima" (NORTE)
+        const y_para_sul = (y > DEAD_ZONE_MAX);   // Y maior significa "para baixo" (SUL)
         const x_para_leste = (x > DEAD_ZONE_MAX); // Equivalente ao x_pos do C
         const x_para_oeste = (x < DEAD_ZONE_MIN); // Equivalente ao x_neg do C
 

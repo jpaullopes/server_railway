@@ -1,5 +1,7 @@
 body {
-    font-family: Arial;
+
+    font-family: Arial, sans-serif; /* Adicionei sans-serif como fallback */
+
     text-align: center;
     margin-top: 50px;
 }
@@ -9,40 +11,97 @@ body {
     border: 1px solid #ccc;
     padding: 20px;
     border-radius: 10px;
-    margin-top: 20px; /* Adicionado para espaçamento */
+
+    position: relative; /* Adicionado para posicionar a rosa dos ventos dentro */
 }
 
-/* Estilos para a Rosa dos Ventos */
-.compass-container {
-    position: relative; /* Importante para posicionar a seta sobre a base */
-    width: 200px; /* Ajuste o tamanho conforme suas imagens */
-    height: 200px; /* Ajuste o tamanho conforme suas imagens */
-    margin-left: auto; /* Centralizar */
-    margin-right: auto; /* Centralizar */
+/* Estilos da Rosa dos Ventos */
+.wind-rose {
+    width: 150px; /* Tamanho da rosa dos ventos */
+    height: 150px;
+    position: relative; /* Para posicionar as direções absolutamente dentro dela */
+    margin: 20px auto; /* Centralizar e dar um espaço */
+    border: 2px solid #333; /* Borda opcional para o círculo externo */
+    border-radius: 50%;    /* Deixa redonda */
+    font-size: 10px;       /* Tamanho da fonte para as letras */
 }
 
-.compass-base {
-    width: 100%;
-    height: 100%;
-}
-
-.compass-arrow {
+.wind-rose .direction {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%; /* Ou o tamanho que fizer sentido para sua seta em relação à base */
-    height: 100%;
-    transform-origin: center center; /* Ponto de rotação da seta (meio) */
-    transition: transform 0.1s linear; /* Suaviza a rotação */
+    width: 30px;  /* Largura da etiqueta da direção */
+    height: 30px; /* Altura da etiqueta da direção */
+    line-height: 30px; /* Centralizar o texto verticalmente */
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    /* transition para suavizar a mudança de cor quando ativa */
+    transition: background-color 0.3s, color 0.3s;
 }
 
-@media (max-width: 600px) {
-    .compass-container {
-        width: 80%;
-        height: auto;
-    }
-    .compass-base, .compass-arrow {
-        width: 100%;
-        height: auto;
-    }
+.wind-rose .center-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #333;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centraliza o ponto */
+}
+
+/* Posicionando cada direção */
+/* Os valores de top/left/transform são para posicionar ao redor do centro */
+.wind-rose .north {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.wind-rose .northeast {
+    top: 10%; /* Ajuste fino da posição */
+    right: 10%;
+    transform: translate(0, 0); /* Ajuste conforme necessário */
+}
+
+.wind-rose .east {
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+}
+
+.wind-rose .southeast {
+    bottom: 10%;
+    right: 10%;
+    transform: translate(0, 0);
+}
+
+.wind-rose .south {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.wind-rose .southwest {
+    bottom: 10%;
+    left: 10%;
+    transform: translate(0, 0);
+}
+
+.wind-rose .west {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
+
+.wind-rose .northwest {
+    top: 10%;
+    left: 10%;
+    transform: translate(0, 0);
+}
+
+/* Estilo para a direção ativa (que será controlada pelo JavaScript) */
+.wind-rose .direction.active {
+    background-color: #007bff; /* Um azul para destacar */
+    color: white;
+    border-radius: 50%; /* Deixa a direção ativa redondinha */
 }
